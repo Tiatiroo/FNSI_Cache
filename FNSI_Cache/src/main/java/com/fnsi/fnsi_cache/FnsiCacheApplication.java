@@ -9,5 +9,4 @@ public class FnsiCacheApplication {
     public static void main(String[] args) {
         SpringApplication.run(FnsiCacheApplication.class, args);
     }
-
 }
