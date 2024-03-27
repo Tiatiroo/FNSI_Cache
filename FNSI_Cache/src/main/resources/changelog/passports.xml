@@ -1,0 +1,28 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="270320241218" author="sergey">
+
+        <createTable tableName="passports">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="system" type="varchar(15)">
+               <constraints nullable="false" />
+            </column>
+            <column name="version" type="varchar(15)">
+                <constraints nullable="false" />
+            </column>
+            <column name="data" type="json">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="passports"
+                columnNames="system, version"
+                constraintName="passports_system_version_uc"/>
+    </changeSet>
+</databaseChangeLog>
