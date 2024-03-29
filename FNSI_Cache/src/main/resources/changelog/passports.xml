@@ -27,8 +27,6 @@
     </changeSet>
 
     <changeSet id="290320242057" author="Vladimir">
-        <addDefaultValue tableName="passports" columnName="system" defaultValue=""/>
-        <addDefaultValue tableName="passports" columnName="version" defaultValue=""/>
         <insert tableName="passports">
             <column name="system" value="1.2.643.5.1.13.13.11.1002"/>
             <column name="version" value="9.3"/>
