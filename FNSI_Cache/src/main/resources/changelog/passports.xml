@@ -9,7 +9,7 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="system" type="varchar(15)">
+            <column name="system" type="varchar(50)">
                <constraints nullable="false" />
             </column>
             <column name="version" type="varchar(15)">
@@ -24,5 +24,42 @@
                 tableName="passports"
                 columnNames="system, version"
                 constraintName="passports_system_version_uc"/>
+    </changeSet>
+
+    <changeSet id="290320242057" author="Vladimir">
+        <insert tableName="passports">
+            <column name="system" value="1.2.643.5.1.13.13.11.1002"/>
+            <column name="version" value="9.3"/>
+        </insert>
+
+        <insert tableName="passports">
+            <column name="system" value="1.2.643.5.1.13.13.11.1477"/>
+            <column name="version" value="4.11"/>
+        </insert>
+
+        <insert tableName="passports">
+            <column name="system" value="1.2.643.5.1.13.13.99.2.778"/>
+            <column name="version" value="1.1"/>
+        </insert>
+
+        <insert tableName="passports">
+            <column name="system" value="1.2.643.5.1.13.13.99.2.48"/>
+            <column name="version" value="7.2"/>
+        </insert>
+
+        <insert tableName="passports">
+            <column name="system" value="1.2.643.5.1.13.13.11.1005"/>
+            <column name="version" value="2.23"/>
+        </insert>
+
+        <insert tableName="passports">
+            <column name="system" value="1.2.643.5.1.13.13.11.1066"/>
+            <column name="version" value="5.4"/>
+        </insert>
+
+        <insert tableName="passports">
+            <column name="system" value="1.2.643.5.1.13.13.11.1071"/>
+            <column name="version" value="4.2"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>
