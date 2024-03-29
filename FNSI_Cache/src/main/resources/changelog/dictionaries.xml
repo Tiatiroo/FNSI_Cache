@@ -26,7 +26,7 @@
         <addUniqueConstraint
                 columnNames="system, code, display"
                 tableName="dictionaries"
-                constraintName="system_code_display_uc"/>
-
+                constraintName="system_code_display_uc"
+        />
     </changeSet>
 </databaseChangeLog>
