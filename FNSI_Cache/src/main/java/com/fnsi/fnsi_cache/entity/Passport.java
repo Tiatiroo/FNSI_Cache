@@ -1,6 +1,5 @@
-package entity;
+package com.fnsi.fnsi_cache.entity;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

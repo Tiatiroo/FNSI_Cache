@@ -1,4 +1,4 @@
-package entity;
+package com.fnsi.fnsi_cache.entity;
 
 
 import lombok.AllArgsConstructor;
