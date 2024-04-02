@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class Dictionary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String system;
     private String version;
     private String code;
