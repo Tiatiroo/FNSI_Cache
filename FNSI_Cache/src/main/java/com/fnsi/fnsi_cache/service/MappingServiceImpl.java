@@ -10,7 +10,7 @@ import javax.persistence.EntityNotFoundException;
 @Service
 public class MappingServiceImpl implements MappingService {
 
-    final MappingRepository mappingRepository;
+    private final MappingRepository mappingRepository;
 
     public MappingServiceImpl(MappingRepository mappingRepository) {
         this.mappingRepository = mappingRepository;
