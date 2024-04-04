@@ -22,7 +22,7 @@ public class ServicePassportsImplement implements PassportsService {
     @Transactional
     public Passport getFromDatabase(String system, String version) {
         return passportRepository.getPassport(system, version)
-                .<RuntimeException>orElseThrow(() ->
+                .orElseThrow(() ->
                         new EntityNotFoundException("Паспорт c системой " + system + " и версией " + version + " не найден!"));
     }
 
@@ -30,7 +30,7 @@ public class ServicePassportsImplement implements PassportsService {
     @Transactional
     public void deleteFromDatabase(String system, String version) {
         passportRepository.delete(passportRepository.getPassport(system, version)
-                .<EntityNotFoundException>orElseThrow(() -> 
+                .orElseThrow(() ->
                         new EntityNotFoundException("Паспорта c системой " + system + " и версией " + version + " не существует")));
     }
 
