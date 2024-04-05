@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
 
 @Service
 public class ServicePassportsImplement implements PassportsService {
@@ -20,11 +21,22 @@ public class ServicePassportsImplement implements PassportsService {
 
     @Override
     @Transactional
+//    public Passport getFromDatabase(String system, String version) {
+//        return passportRepository.getPassport(system, version)
+//                .orElseThrow(() ->
+//                        new EntityNotFoundException("Паспорт c системой " + system + " и версией " + version + " не найден!"));
+//    }
     public Passport getFromDatabase(String system, String version) {
-        return passportRepository.getPassport(system, version)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Паспорт c системой " + system + " и версией " + version + " не найден!"));
+        Optional<Passport> optional = passportRepository.getPassport(system, version);
+        if (optional.isPresent() && optional.get().getData() != null) {
+            return optional.get();
+        } else return null;
     }
+
+
+
+//                .orElseThrow(() ->
+//                        new EntityNotFoundException("Паспорт c системой " + system + " и версией " + version + " не найден!"));
 
     @Override
     @Transactional
