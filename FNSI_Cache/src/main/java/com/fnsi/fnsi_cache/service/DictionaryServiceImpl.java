@@ -3,10 +3,13 @@ package com.fnsi.fnsi_cache.service;
 import com.fnsi.fnsi_cache.dao.DictionaryRepository;
 import com.fnsi.fnsi_cache.entity.Dictionary;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+
 @Service
 public class DictionaryServiceImpl implements DictionaryService {
     private final DictionaryRepository dictionaryRepository;
@@ -22,6 +25,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Transactional
+    @Cacheable(cacheManager = "cacheManager", value = "dictionaries", key = "{#system + #version + #code}")
     public Dictionary getDictionary(String system, String version, String code) {
         return dictionaryRepository.getDictionary(system,version,code)
                 .orElseThrow(()-> new EntityNotFoundException("Запрашиваемый справочник с системой " + system + " версии " + version + " и кодом " + code + " не найден"));
@@ -35,6 +39,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheManager = "cacheManager", value = "dictionaries", key = "{#system + #version + #code}")
     public void deleteDictionary(String system, String version, String code) {
         dictionaryRepository.delete(dictionaryRepository.getDictionary(system,version,code)
                 .orElseThrow(()-> new EntityNotFoundException("Запрашиваемый справочник с системой " + system + " версии " + version + " и кодом " + code + " не найден")));
