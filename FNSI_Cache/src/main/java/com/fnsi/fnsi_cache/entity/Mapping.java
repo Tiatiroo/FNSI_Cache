@@ -16,6 +16,7 @@ public class Mapping {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "\"system\"")
     private String system;
     private String version;
     private String code;
