@@ -9,12 +9,14 @@ import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableCaching
+@PropertySource("classpath:application-${spring.profiles.active}.properties")
 public class AppConfig {
     @Bean
     RestTemplate restTemplate(){
