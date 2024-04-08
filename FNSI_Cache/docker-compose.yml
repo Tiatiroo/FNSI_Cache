@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  mysql:
+    container_name: mysql
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - ${MYSQL_PORT_EXTERNAL}:${MYSQL_PORT_INTERNAL}
+    expose:
+      - ${MYSQL_PORT_INTERNAL}
+    healthcheck:
+      test: ${MYSQL_TEST_RESPONSE}
+      interval: 2s
+      timeout: 20s
+      retries: 10
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+    env_file:
+      - .env
+
+  fnsi:
+    container_name: ${FNSI_CONTAINER_NAME}
+    build: ${FNSI_BUILD_PATH}
+    hostname: ${FNSI_HOSTNAME}
+    ports:
+      - ${FNSI_PORT_EXTERNAL}:${FNSI_PORT_INTERNAL}
+    expose:
+      - ${FNSI_PORT_INTERNAL}
+    environment:
+      WAIT_HOSTS: ${MYSQL_PORT_INTERNAL}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: on-failure
+    env_file:
+      - .env
