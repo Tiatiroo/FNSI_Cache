@@ -3,6 +3,7 @@ package com.fnsi.fnsi_cache.service;
 import com.fnsi.fnsi_cache.dao.PassportRepository;
 import com.fnsi.fnsi_cache.entity.Passport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +18,8 @@ import java.util.Optional;
 public class ServicePassportsImplement implements PassportsService {
     private final PassportRepository passportRepository;
     private final RestTemplate restTemplate;
+    @Value("${user.key}")
+    private String userKey;
 
     @Autowired
     public ServicePassportsImplement(PassportRepository passportRepository, RestTemplate restTemplate) {
@@ -32,7 +35,7 @@ public class ServicePassportsImplement implements PassportsService {
             return optional.get();
         }
         String url = "http://nsi.rosminzdrav.ru/port/rest/passport?" +
-                "userKey=2b6a3146-9b41-4d0a-a3b0-51d294cf2e03&" +
+                "userKey="+ userKey  +
                 "identifier=" + system + "&version=" + version;
         String json = restTemplate.getForObject(url, String.class);
         JsonNode node;
