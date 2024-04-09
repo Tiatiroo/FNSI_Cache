@@ -14,30 +14,30 @@ public class MappingController {
     public MappingController(MappingService mappingService){
         this.mappingService = mappingService;
     }
-
-    @GetMapping(value = "/mapping/")
+    @RequestMapping("/mappings")
+    @GetMapping
     public List<Mapping> getAllMap() {
         return mappingService.getAllMap();
     }
 
-    @GetMapping(value = "/mapping/{system}/{version}")
+    @GetMapping(value = "{system}{version}")
     public Mapping getMapping(@PathVariable(name = "system")String system,
                               @PathVariable(name = "version")String version ) {
         Mapping mapping = mappingService.getMapping(system, version);
         return mapping;
     }
 
-    @PutMapping(value = "/mapping/")
+    @PutMapping
     public Mapping replaceMap(@RequestBody Mapping replaceMap){
         return mappingService.updateMapping(replaceMap);
     }
 
-    @PostMapping("/mapping")
+    @PostMapping
     public Mapping newMapping(@RequestBody Mapping newMapping) {
         return mappingService.addMapping(newMapping);
     }
 
-    @DeleteMapping(value = "/mapping/{system}/{version}")
+    @DeleteMapping(value ="{system}{version}")
     public void deleteMapping (@PathVariable(name = "system")String system,
                                @PathVariable(name = "version")String version){
         mappingService.deleteMapping(system, version);
