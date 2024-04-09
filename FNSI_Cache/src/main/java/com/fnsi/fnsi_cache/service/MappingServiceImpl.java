@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,6 +21,12 @@ public class MappingServiceImpl implements MappingService {
     public MappingServiceImpl(MappingRepository mappingRepository, PassportsService passportsService) {
         this.mappingRepository = mappingRepository;
         this.passportsService = passportsService;
+    }
+
+    @Override
+    @Transactional
+    public List<Mapping> getAllMap() {
+        return mappingRepository.findAll();
     }
 
     @Override
