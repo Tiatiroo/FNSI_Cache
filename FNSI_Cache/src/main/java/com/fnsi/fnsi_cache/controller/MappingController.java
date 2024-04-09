@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequestMapping("/mappings")
 @RestController
 public class MappingController {
     private final MappingService mappingService;
@@ -14,30 +14,30 @@ public class MappingController {
     public MappingController(MappingService mappingService){
         this.mappingService = mappingService;
     }
-    @RequestMapping("/mappings")
-    @GetMapping
+
+    @GetMapping("/")
     public List<Mapping> getAllMap() {
         return mappingService.getAllMap();
     }
 
-    @GetMapping(value = "{system}{version}")
+    @GetMapping(value = "/{system}/{version}")
     public Mapping getMapping(@PathVariable(name = "system")String system,
                               @PathVariable(name = "version")String version ) {
         Mapping mapping = mappingService.getMapping(system, version);
         return mapping;
     }
 
-    @PutMapping
+    @PutMapping("/")
     public Mapping replaceMap(@RequestBody Mapping replaceMap){
         return mappingService.updateMapping(replaceMap);
     }
 
-    @PostMapping
+    @PostMapping("/")
     public Mapping newMapping(@RequestBody Mapping newMapping) {
         return mappingService.addMapping(newMapping);
     }
 
-    @DeleteMapping(value ="{system}{version}")
+    @DeleteMapping("/{system}/{version}")
     public void deleteMapping (@PathVariable(name = "system")String system,
                                @PathVariable(name = "version")String version){
         mappingService.deleteMapping(system, version);
