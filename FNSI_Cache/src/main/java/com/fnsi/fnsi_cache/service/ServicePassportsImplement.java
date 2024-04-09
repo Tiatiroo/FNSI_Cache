@@ -36,7 +36,8 @@ public class ServicePassportsImplement implements PassportsService {
         }
         String url = "http://nsi.rosminzdrav.ru/port/rest/passport?" +
                 "userKey="+ userKey  +
-                "identifier=" + system + "&version=" + version;
+                "&identifier=" + system +
+                "&version=" + version;
         String json = restTemplate.getForObject(url, String.class);
         JsonNode node;
         try {

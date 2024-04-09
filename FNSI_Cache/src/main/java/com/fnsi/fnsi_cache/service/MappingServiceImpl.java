@@ -44,9 +44,9 @@ public class MappingServiceImpl implements MappingService {
                 }
             }
             if (code == null || display == null)
-                throw new RuntimeException("Не удалось получить поля code или display из таблицы паспортов.");
+                throw new RuntimeException("Не удалось получить поля code или display паспорта с системой " + system + " и версией " + version);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("не удалось получить данные из таблицы паспортов.");
+            throw new RuntimeException("не удалось получить данные из таблицы паспортов, для паспорта с системой " + system + " и версией " + version);
         }
         Mapping mapping = new Mapping(null, system, version, code, display);
         return mappingRepository.save(mapping);
