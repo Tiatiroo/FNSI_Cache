@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fnsi.fnsi_cache.dao.MappingRepository;
 import com.fnsi.fnsi_cache.entity.Mapping;
 import com.fnsi.fnsi_cache.entity.Passport;
+import com.fnsi.fnsi_cache.exception.DataNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,9 +52,9 @@ public class MappingServiceImpl implements MappingService {
                 }
             }
             if (code == null || display == null)
-                throw new RuntimeException("Не удалось получить поля code или display паспорта с системой " + system + " и версией " + version);
+                throw new DataNotFoundException("Не удалось получить поля code или display паспорта с системой " + system + " и версией " + version);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("не удалось получить данные из таблицы паспортов, для паспорта с системой " + system + " и версией " + version);
+            throw new DataNotFoundException("не удалось получить данные из таблицы паспортов, для паспорта с системой " + system + " и версией " + version);
         }
         Mapping mapping = new Mapping(null, system, version, code, display);
         return mappingRepository.save(mapping);
