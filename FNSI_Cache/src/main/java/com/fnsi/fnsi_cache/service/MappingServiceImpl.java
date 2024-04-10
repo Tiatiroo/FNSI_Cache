@@ -48,7 +48,7 @@ public class MappingServiceImpl implements MappingService {
                     code = key.get("field").asText();
                 }
                 if (key.get("type").asText().equals("VALUE")) {
-                    display = key.get("field").asText();
+                    display = key.get("field").asText() ;
                 }
             }
             if (code == null || display == null)
