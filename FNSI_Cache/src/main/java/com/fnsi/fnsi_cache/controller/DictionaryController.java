@@ -6,7 +6,7 @@ import com.fnsi.fnsi_cache.service.DictionaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/mappings")
+@RequestMapping("/dictionaries")
 @RestController
 public class DictionaryController {
     private final DictionaryService dictionaryService;
