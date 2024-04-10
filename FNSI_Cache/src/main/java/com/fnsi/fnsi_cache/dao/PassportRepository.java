@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface PassportRepository extends JpaRepository<Passport, Long> {
    @Query(value = "select p from Passport p where p.system = :system and p.version = :version")
    Optional<Passport> getPassport(@Param("system") String system, @Param("version") String version);
+
 }
