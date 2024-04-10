@@ -20,7 +20,7 @@ public class MappingController {
         return mappingService.getAllMap();
     }
 
-    @GetMapping(value = "/{system}/{version}")
+    @GetMapping("/{system}/{version}")
     public Mapping getMapping(@PathVariable(name = "system")String system,
                               @PathVariable(name = "version")String version ) {
         Mapping mapping = mappingService.getMapping(system, version);
