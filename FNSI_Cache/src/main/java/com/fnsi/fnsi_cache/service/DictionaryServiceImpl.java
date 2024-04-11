@@ -6,14 +6,14 @@ import com.fnsi.fnsi_cache.dao.DictionaryRepository;
 import com.fnsi.fnsi_cache.entity.Dictionary;
 import com.fnsi.fnsi_cache.entity.Mapping;
 import com.fnsi.fnsi_cache.entity.Passport;
+import com.fnsi.fnsi_cache.exception.FNSIException;
+import com.fnsi.fnsi_cache.exception.FNSIParsingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
-import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -68,13 +68,13 @@ public class DictionaryServiceImpl implements DictionaryService {
         try {
             jsonNode = new ObjectMapper().readTree(jsonToString);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new FNSIParsingException("Запрашиваемая информация о справочнике с системой " + system + " версии" + version + " и кодом " + code + "не найдена");
         }
         if (!jsonNode.get("result").asText().equals("OK")) {
-            throw new RuntimeException(jsonNode.get("resultText").asText());
+            throw new FNSIException(jsonNode.get("resultText").asText());
         }
         if (jsonNode.withArray("list").isEmpty()) {
-            throw new RuntimeException("Запрашиваемый справочник с системой " + system + " версии" + version + " и кодом " + code + "не найден");
+            throw new FNSIException("Запрашиваемый справочник с системой " + system + " версии" + version + " и кодом " + code + "не найден");
         }
         for (JsonNode list : jsonNode.withArray("list").get(0)) {
             if (list.get("column").asText().equals(displayMapping)) {
@@ -82,7 +82,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             }
         }
         if (display == null) {
-            throw new RuntimeException("Запрашиваемый справочник с системой " + system + " версии" + version + " и кодом " + code + "не найден");
+            throw new FNSIException("Запрашиваемый справочник с системой " + system + " версии" + version + " и кодом " + code + "не найден");
         }
         Dictionary dictionary = new Dictionary(null, system, version, code, display);
         return dictionaryRepository.save(dictionary);
@@ -104,7 +104,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             try {
                 jsonNode = new ObjectMapper().readTree(passport.getData());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new FNSIParsingException("Не удалось получить паспорт для справочника с системой " + system + " версии" + version + "не найден");
             }
 
             if (jsonNode.get("rowsCount").asLong() == rowsCountDB) {
@@ -126,10 +126,10 @@ public class DictionaryServiceImpl implements DictionaryService {
                 try {
                     jsonNode = new ObjectMapper().readTree(jsonToString);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new FNSIParsingException("Не удалось получить маппинг полей для справочника с системой " + system + " версии" + version + "не найден");
                 }
                 if (!jsonNode.get("result").asText().equals("OK")) {
-                    throw new RuntimeException(jsonNode.get("resultText").asText());
+                    throw new FNSIException(jsonNode.get("resultText").asText());
                 }
                 String code = null;
                 String display = null;
@@ -153,6 +153,6 @@ public class DictionaryServiceImpl implements DictionaryService {
     @CacheEvict(cacheManager = "cacheManager", value = "dictionaries", key = "{#system + #version + #code}")
     public void deleteDictionary(String system, String version, String code) {
         dictionaryRepository.delete(dictionaryRepository.getDictionary(system, version, code)
-                .orElseThrow(() -> new EntityNotFoundException("Запрашиваемый справочник с системой " + system + " версии " + version + " и кодом " + code + " не найден")));
+                .orElseThrow(() -> new FNSIException("Запрашиваемый справочник с системой " + system + " версии " + version + " и кодом " + code + " не найден")));
     }
 }

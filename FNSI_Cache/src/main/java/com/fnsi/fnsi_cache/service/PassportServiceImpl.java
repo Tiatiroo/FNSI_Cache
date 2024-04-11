@@ -2,6 +2,8 @@ package com.fnsi.fnsi_cache.service;
 
 import com.fnsi.fnsi_cache.dao.PassportRepository;
 import com.fnsi.fnsi_cache.entity.Passport;
+import com.fnsi.fnsi_cache.exception.FNSIException;
+import com.fnsi.fnsi_cache.exception.FNSIParsingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -44,10 +44,10 @@ public class PassportServiceImpl implements PassportService {
         try {
             node = new ObjectMapper().readTree(json);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new FNSIParsingException("Получить информацию о паспорта c системой " + system + " и версией " + version + " не существует");
         }
         if (!node.get("result").asText().equals("OK")) {
-            throw new RuntimeException(node.get("resultText").asText());
+            throw new FNSIException(node.get("resultText").asText());
         }
         Passport passport = passportRepository.getPassport(system, version).orElse(new Passport(null, system, version, json));
         passport.setData(json);
@@ -70,7 +70,7 @@ public class PassportServiceImpl implements PassportService {
     public void deleteFromDatabase(String system, String version) {
         passportRepository.delete(passportRepository.getPassport(system, version)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Паспорта c системой " + system + " и версией " + version + " не существует")));
+                        new FNSIException("Паспорта c системой " + system + " и версией " + version + " не существует")));
     }
     @Override
     @Transactional
