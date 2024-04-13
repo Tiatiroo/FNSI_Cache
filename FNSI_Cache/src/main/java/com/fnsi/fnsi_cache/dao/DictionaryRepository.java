@@ -10,11 +10,9 @@ import java.util.Optional;
 
 @Repository
 public interface DictionaryRepository extends JpaRepository<Dictionary,Long> {
-
     @Query(value = "select d from Dictionary d where d.system = :system and d.version = :version and d.code = :code")
     Optional<Dictionary> getDictionary(@Param("system") String system, @Param("version") String version, @Param("code") String code);
 
     @Query(value = "select count(d) from Dictionary d where d.system = :system and d.version = :version")
     Long getDictionariesCount(@Param("system") String system, @Param("version") String version);
-
 }

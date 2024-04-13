@@ -17,11 +17,11 @@ import java.util.Optional;
 @Service
 public class MappingServiceImpl implements MappingService {
     private final MappingRepository mappingRepository;
-    private final PassportsService passportsService;
+    private final PassportService passportService;
 
-    public MappingServiceImpl(MappingRepository mappingRepository, PassportsService passportsService) {
+    public MappingServiceImpl(MappingRepository mappingRepository, PassportService passportService) {
         this.mappingRepository = mappingRepository;
-        this.passportsService = passportsService;
+        this.passportService = passportService;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class MappingServiceImpl implements MappingService {
         String code = null;
         String display = null;
 
-        Passport passport = passportsService.getFromDatabase(system, version);
+        Passport passport = passportService.getFromDatabase(system, version);
         try {
             JsonNode node = new ObjectMapper().readTree(passport.getData());
             for (JsonNode key : node.withArray("keys")) {

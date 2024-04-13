@@ -5,6 +5,8 @@ public interface DictionaryService {
     Dictionary addDictionary(Dictionary dictionary);
     Dictionary getDictionary(String system, String version, String code);
     Dictionary updateDictionary(Dictionary dictionary);
+    void updateDictionaryList();
     void deleteDictionary(String system, String version, String code);
+
 }
 

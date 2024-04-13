@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fnsi.fnsi_cache.dao.DictionaryRepository;
 import com.fnsi.fnsi_cache.entity.Dictionary;
 import com.fnsi.fnsi_cache.entity.Mapping;
-
+import com.fnsi.fnsi_cache.entity.Passport;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,15 +22,20 @@ import java.util.Optional;
 public class DictionaryServiceImpl implements DictionaryService {
     private final DictionaryRepository dictionaryRepository;
     private final MappingService mappingService;
+    private final PassportServiceImpl passportService;
     private final RestTemplate restTemplate;
+
 
     @Value("${user.key}")
     private String userKey;
+    @Value("${list.size}")
+    private int size = 100;
 
 
-    public DictionaryServiceImpl(DictionaryRepository dictionaryRepository, MappingService mappingService, RestTemplate restTemplate) {
+    public DictionaryServiceImpl(DictionaryRepository dictionaryRepository, MappingService mappingService, PassportServiceImpl passportService, RestTemplate restTemplate) {
         this.dictionaryRepository = dictionaryRepository;
         this.mappingService = mappingService;
+        this.passportService = passportService;
         this.restTemplate = restTemplate;
     }
 
@@ -57,18 +62,18 @@ public class DictionaryServiceImpl implements DictionaryService {
                 "&version=" + version +
                 "&filters=" + codeMapping + "|" + code +
                 "&columns=" + displayMapping;
-        String jsonString = restTemplate.getForObject(url, String.class);
+        String jsonToString = restTemplate.getForObject(url, String.class);
         String display = null;
         JsonNode jsonNode;
         try {
-            jsonNode = new ObjectMapper().readTree(jsonString);
+            jsonNode = new ObjectMapper().readTree(jsonToString);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         if (!jsonNode.get("result").asText().equals("OK")) {
             throw new RuntimeException(jsonNode.get("resultText").asText());
         }
-        if (jsonNode.withArray("list").isEmpty()){
+        if (jsonNode.withArray("list").isEmpty()) {
             throw new RuntimeException("Запрашиваемый справочник с системой " + system + " версии" + version + " и кодом " + code + "не найден");
         }
         for (JsonNode list : jsonNode.withArray("list").get(0)) {
@@ -87,6 +92,60 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Transactional
     public Dictionary updateDictionary(Dictionary dictionary) {
         return dictionaryRepository.save(dictionary);
+    }
+
+    @Override
+    public void updateDictionaryList() {
+        for (Passport passport : passportService.getPassportList()) {
+            String system = passport.getSystem();
+            String version = passport.getVersion();
+            Long rowsCountDB = dictionaryRepository.getDictionariesCount(system, version);
+            JsonNode jsonNode;
+            try {
+                jsonNode = new ObjectMapper().readTree(passport.getData());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (jsonNode.get("rowsCount").asLong() == rowsCountDB) {
+                continue;
+            }
+            Mapping mapping = mappingService.getMapping(system, version);
+            String codeMapping = mapping.getCode();
+            String displayMapping = mapping.getDisplay();
+            Long pageCount = jsonNode.get("rowsCount").asLong() / size + 1;
+            for (int page = 1; page <= pageCount; page++) {
+                String url = "http://nsi.rosminzdrav.ru/port/rest/data?userKey=" + userKey +
+                        "&identifier=" + system +
+                        "&version=" + version +
+                        "&page=" + page +
+                        "&size=" + size +
+                        "&columns=" + codeMapping + "," + displayMapping +
+                        "&sorting=" + codeMapping;
+                String jsonToString = restTemplate.getForObject(url, String.class);
+                try {
+                    jsonNode = new ObjectMapper().readTree(jsonToString);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                if (!jsonNode.get("result").asText().equals("OK")) {
+                    throw new RuntimeException(jsonNode.get("resultText").asText());
+                }
+                String code = null;
+                String display = null;
+                for (JsonNode jsonList : jsonNode.withArray("list")) {
+                    for (JsonNode json : jsonList) {
+                        if (json.get("column").asText().equals(codeMapping)) {
+                            code = json.get("value").asText();
+                        }
+                        if (json.get("column").asText().equals(displayMapping)) {
+                            display = json.get("value").asText();
+                        }
+                    }
+                    dictionaryRepository.save(dictionaryRepository.getDictionary(system, version, code).orElse(new Dictionary(null, system, version, code, display)));
+                }
+            }
+        }
     }
 
     @Override

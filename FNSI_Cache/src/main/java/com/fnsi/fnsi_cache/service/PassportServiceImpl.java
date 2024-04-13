@@ -12,17 +12,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ServicePassportsImplement implements PassportsService {
+public class PassportServiceImpl implements PassportService {
     private final PassportRepository passportRepository;
     private final RestTemplate restTemplate;
     @Value("${user.key}")
     private String userKey;
 
     @Autowired
-    public ServicePassportsImplement(PassportRepository passportRepository, RestTemplate restTemplate) {
+    public PassportServiceImpl(PassportRepository passportRepository, RestTemplate restTemplate) {
         this.passportRepository = passportRepository;
         this.restTemplate = restTemplate;
     }
@@ -52,6 +53,18 @@ public class ServicePassportsImplement implements PassportsService {
         passport.setData(json);
         return passportRepository.save(passport);
     }
+
+    @Override
+    @Transactional
+    public List<Passport> getPassportList(){
+        for (Passport passport : passportRepository.findAll()){
+            if (passport.getData() == null){
+                getFromDatabase(passport.getSystem(),passport.getVersion());
+            }
+        }
+        return passportRepository.findAll();
+    }
+
     @Override
     @Transactional
     public void deleteFromDatabase(String system, String version) {
