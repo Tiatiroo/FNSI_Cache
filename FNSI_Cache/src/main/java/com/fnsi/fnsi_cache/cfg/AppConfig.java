@@ -10,10 +10,12 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.TimeUnit;
 
+@EnableScheduling
 @Configuration
 @EnableCaching
 @PropertySource("classpath:application-${spring.profiles.active}.properties")
