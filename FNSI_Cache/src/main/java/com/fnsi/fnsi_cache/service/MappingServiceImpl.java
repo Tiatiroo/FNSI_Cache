@@ -1,16 +1,15 @@
 package com.fnsi.fnsi_cache.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fnsi.fnsi_cache.dao.MappingRepository;
 import com.fnsi.fnsi_cache.entity.Mapping;
 import com.fnsi.fnsi_cache.entity.Passport;
-import com.fnsi.fnsi_cache.exception.DataNotFoundException;
+import com.fnsi.fnsi_cache.exception.FNSIException;
+import com.fnsi.fnsi_cache.exception.FNSIParsingException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,22 +38,24 @@ public class MappingServiceImpl implements MappingService {
         }
         String code = null;
         String display = null;
+        JsonNode node = null;
 
         Passport passport = passportService.getFromDatabase(system, version);
         try {
-            JsonNode node = new ObjectMapper().readTree(passport.getData());
-            for (JsonNode key : node.withArray("keys")) {
-                if (key.get("type").asText().equals("PRIMARY")) {
-                    code = key.get("field").asText();
-                }
-                if (key.get("type").asText().equals("VALUE")) {
-                    display = key.get("field").asText() ;
-                }
+            node = new ObjectMapper().readTree(passport.getData());
+        } catch (IOException e) {
+            throw new FNSIParsingException("Не удалось получить информацию о маппинга полей паспорта с системой " + system + " и версией " + version);
+        }
+        for (JsonNode key : node.withArray("keys")) {
+            if (key.get("type").asText().equals("PRIMARY")) {
+                code = key.get("field").asText();
             }
-            if (code == null || display == null)
-                throw new DataNotFoundException("Не удалось получить поля code или display паспорта с системой " + system + " и версией " + version);
-        } catch (JsonProcessingException e) {
-            throw new DataNotFoundException("не удалось получить данные из таблицы паспортов, для паспорта с системой " + system + " и версией " + version);
+            if (key.get("type").asText().equals("VALUE")) {
+                display = key.get("field").asText() ;
+            }
+        }
+        if (code == null || display == null){
+            throw new FNSIParsingException("Не удалось получить поля code или display паспорта с системой " + system + " и версией " + version);
         }
         Mapping mapping = new Mapping(null, system, version, code, display);
         return mappingRepository.save(mapping);
@@ -77,7 +78,7 @@ public class MappingServiceImpl implements MappingService {
     @Transactional
     public void deleteMapping(String system, String version) {
         mappingRepository.delete(mappingRepository.getMapping(system, version).orElseThrow(() ->
-                new EntityNotFoundException("Не удалось удалить поля маппинга спрочника с параметрами: система " + system + " версия " + version)));
+                new FNSIException("Не удалось удалить поля маппинга спрочника с параметрами: система " + system + " версия " + version)));
 
     }
 }
